@@ -1,26 +1,18 @@
-import {
-  Controller,
-  Get,
-  MiddlewareConsumer,
-  Module,
-  NestMiddleware,
-  NestModule,
-} from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { typeOrmConfig } from './config/typeorm.config';
 import { TasksModule } from './tasks/tasks.module';
 import { AuthModule } from './auth/auth.module';
-import { NextFunction } from 'express';
 import { ConfigModule } from '@nestjs/config';
 import { configuration } from './config/configuration';
 
-@Controller('test')
-export class test {
-  @Get('testRoute')
-  testFunc() {
-    return 'hello';
-  }
-}
+// @Controller('test')
+// export class test {
+//   @Get('testRoute')
+//   testFunc() {
+//     return 'hello';
+//   }
+// }
 
 @Module({
   imports: [
@@ -42,17 +34,19 @@ export class test {
     TasksModule,
     AuthModule,
   ],
-  controllers: [test],
+  // controllers: [test],
 })
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer.apply(loggerMiddleware).forRoutes('test/testRoute');
-  }
+export class AppModule {
+  // configure(consumer: MiddlewareConsumer) {
+  //   consumer.apply(loggerMiddleware).forRoutes('test/testRoute');
+  // }
 }
 
-export class loggerMiddleware implements NestMiddleware {
-  use(req: Request, res: Response, next: NextFunction) {
-    console.log('Request..');
-    next();
-  }
-}
+//implements NestModule
+
+// export class loggerMiddleware implements NestMiddleware {
+//   use(req: Request, res: Response, next: NextFunction) {
+//     console.log('Request..');
+//     next();
+//   }
+// }
