@@ -2,12 +2,13 @@ import { registerAs } from '@nestjs/config';
 import { envSchema } from './env.validation';
 import { z } from 'zod';
 
-export const configuration = registerAs('app', () => {
+export const configuration = registerAs('config', () => {
   try {
     const validated = envSchema.parse(process.env);
     return {
       nodeEnv: validated.NODE_ENV,
       port: validated.PORT,
+
       database: {
         host: validated.DB_HOST,
         port: validated.DB_PORT,

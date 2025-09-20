@@ -1,7 +1,30 @@
 import { NestFactory } from '@nestjs/core';
-import { ConfigType } from '@nestjs/config';
+import { ConfigModule, ConfigType } from '@nestjs/config';
 import { configuration } from './config/configuration';
-import { AppModule } from './app.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { typeOrmConfig } from './config/typeorm.config';
+import { Module } from '@nestjs/common';
+
+@Module({
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      load: [configuration],
+      envFilePath: [
+        `.env.${process.env.NODE_ENV}.local`, // local overrides (ignored in git)
+        `.env.${process.env.NODE_ENV}`, // environment base
+        '.env', // shared defaults
+      ],
+    }),
+
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [configuration.KEY],
+      useFactory: typeOrmConfig,
+    }),
+  ],
+})
+class AppModule {}
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -14,5 +37,3 @@ async function bootstrap() {
 }
 
 bootstrap().catch((err) => console.error('Error starting server:', err));
-
-process.env.DB_LOGGING = 'false';

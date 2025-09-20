@@ -1,10 +1,14 @@
-import { TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { configuration } from './configuration';
 import { ConfigType } from '@nestjs/config';
+import { configuration } from './configuration';
+import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 
 export const typeOrmConfig = (
   config: ConfigType<typeof configuration>,
 ): TypeOrmModuleOptions => {
+  if (!config) {
+    throw new Error('config is missing!');
+  }
+
   return {
     type: 'postgres',
     host: config.database.host,
@@ -14,6 +18,5 @@ export const typeOrmConfig = (
     database: config.database.name,
     synchronize: config.database.synchronize,
     logging: config.database.logging,
-    entities: [__dirname + '/../**/*.entity.{ts,js}'],
   };
 };
