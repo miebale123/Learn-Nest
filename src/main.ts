@@ -1,30 +1,7 @@
 import { NestFactory } from '@nestjs/core';
-import { ConfigModule, ConfigType } from '@nestjs/config';
+import { ConfigType } from '@nestjs/config';
 import { configuration } from './config/configuration';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { typeOrmConfig } from './config/typeorm.config';
-import { Module } from '@nestjs/common';
-
-@Module({
-  imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-      load: [configuration],
-      envFilePath: [
-        `.env.${process.env.NODE_ENV}.local`, // local overrides (ignored in git)
-        `.env.${process.env.NODE_ENV}`, // environment base
-        '.env', // shared defaults
-      ],
-    }),
-
-    TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [configuration.KEY],
-      useFactory: typeOrmConfig,
-    }),
-  ],
-})
-class AppModule {}
+import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
