@@ -1,18 +1,9 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { typeOrmConfig } from './config/typeorm.config';
+import { ConfigModule } from '@nestjs/config';
+import { configuration, typeOrmConfig } from './config';
 import { TasksModule } from './tasks/tasks.module';
 import { AuthModule } from './auth/auth.module';
-import { ConfigModule } from '@nestjs/config';
-import { configuration } from './config/configuration';
-
-// @Controller('test')
-// export class test {
-//   @Get('testRoute')
-//   testFunc() {
-//     return 'hello';
-//   }
-// }
 
 @Module({
   imports: [
@@ -36,17 +27,4 @@ import { configuration } from './config/configuration';
   ],
   // controllers: [test],
 })
-export class AppModule {
-  // configure(consumer: MiddlewareConsumer) {
-  //   consumer.apply(loggerMiddleware).forRoutes('test/testRoute');
-  // }
-}
-
-//implements NestModule
-
-// export class loggerMiddleware implements NestMiddleware {
-//   use(req: Request, res: Response, next: NextFunction) {
-//     console.log('Request..');
-//     next();
-//   }
-// }
+export class AppModule {}
