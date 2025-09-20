@@ -1,11 +1,15 @@
-import { ConflictException, Injectable, InternalServerErrorException } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { User } from "./user.entity";
-import { Repository } from "typeorm";
-import { JwtService } from "@nestjs/jwt";
-import { AuthCredentialsDto } from "./dto/auth-credentials.dto";
-import bcrypt from 'bcrypt'
-import { JwtPayload } from "./jwt-payload.interface";
+import {
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { User } from './user.entity';
+import { Repository } from 'typeorm';
+import { JwtService } from '@nestjs/jwt';
+import { AuthCredentialsDto } from './dto/auth-credentials.dto';
+import bcrypt from 'bcrypt';
+import { JwtPayload } from './jwt-payload.interface';
 
 @Injectable()
 export class UserRepository {
@@ -14,14 +18,13 @@ export class UserRepository {
     private readonly userRepository: Repository<User>,
     private readonly jwtService: JwtService,
   ) {}
-
   async signUp(authCredentialsDto: AuthCredentialsDto) {
     const { username, password } = authCredentialsDto;
 
     const hashedPassword = await bcrypt.hash(password, 12);
 
     const payLoad: JwtPayload = { username };
-    const accessToken = this.jwtService.sign(payLoad, { expiresIn: '15m' });
+    const accessToken = this.jwtService.sign(payLoad);
 
     const refreshToken = crypto.randomUUID();
 
