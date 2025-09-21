@@ -1,10 +1,14 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from './user.entity';
-import { JwtStrategy } from './jwt.strategy';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
-import {AuthController, UserRepository, AuthService} from './index'
+import {
+  AuthController,
+  UserRepository,
+  AuthService,
+  User,
+  JwtStrategy,
+} from '.';
 
 @Module({
   imports: [
@@ -17,6 +21,7 @@ import {AuthController, UserRepository, AuthService} from './index'
       },
     }),
   ],
+
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy, UserRepository],
   exports: [PassportModule, JwtStrategy],
