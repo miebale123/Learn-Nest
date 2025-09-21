@@ -1,8 +1,9 @@
 import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Task } from 'src/tasks/task.entity';
 import { Repository } from 'typeorm';
+
 import { TaskStatus } from './task.enum';
+import { Task } from './task.entity';
 
 class CreateTaskDto {
   title: string;

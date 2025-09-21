@@ -4,11 +4,12 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from './user.entity';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { AuthCredentialsDto } from './dto/auth-credentials.dto';
 import bcrypt from 'bcrypt';
+
+import { User } from './user.entity';
 import { JwtPayload } from './jwt-payload.interface';
 
 @Injectable()

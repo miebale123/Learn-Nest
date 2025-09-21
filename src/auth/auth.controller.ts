@@ -9,12 +9,12 @@ import {
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import type { Request, Response } from 'express';
 
 import { AuthCredentialsDto } from './dto/auth-credentials.dto';
 
-import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from './get-user.decorator';
-import type { Request, Response } from 'express';
 import { AuthService } from './auth.service';
 
 interface RequestWithCookies extends Request {

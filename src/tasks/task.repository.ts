@@ -1,16 +1,15 @@
 import {
   Injectable,
   InternalServerErrorException,
-  // InternalServerErrorException,
   Logger,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+
+import { FilterTaskDto, CreateTaskDto } from './dto';
+import { User } from 'src/auth/user.entity';
 import { Task } from './task.entity';
 import { TaskStatus } from './task.enum';
-import { CreateTaskDto } from './dto/task.dto';
-import { FilterTaskDto } from './dto/filter.dto';
-import { User } from 'src/auth/user.entity';
 
 @Injectable()
 export class TasksRepository {
