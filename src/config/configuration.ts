@@ -17,6 +17,7 @@ export const configuration = registerAs('config', () => {
         name: validated.DB_NAME,
         synchronize: validated.DB_SYNCHRONIZE,
         logging: validated.DB_LOGGING,
+        autoLoadEntities: validated.AUTOLOADENTITIES
       },
     };
   } catch (err: unknown) {

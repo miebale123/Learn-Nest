@@ -6,11 +6,12 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
-import { AuthCredentialsDto } from './dto/auth-credentials.dto';
 import bcrypt from 'bcrypt';
+import crypto from 'crypto';
 
 import { User } from './user.entity';
 import { JwtPayload } from './jwt-payload.interface';
+import { SignupDto } from './dto/auth-credentials.dto';
 
 @Injectable()
 export class UserRepository {
@@ -18,14 +19,13 @@ export class UserRepository {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     private readonly jwtService: JwtService,
-  ) {}
-  async signUp(authCredentialsDto: AuthCredentialsDto) {
-    const { username, password } = authCredentialsDto;
+  ) { }
+  async signUp(dto: SignupDto) {
+    const { username, email, password } = dto;
+
+    console.log(username, password)
 
     const hashedPassword = await bcrypt.hash(password, 12);
-
-    const payLoad: JwtPayload = { username };
-    const accessToken = this.jwtService.sign(payLoad);
 
     const refreshToken = crypto.randomUUID();
 
@@ -33,6 +33,7 @@ export class UserRepository {
 
     const user = this.userRepository.create({
       username,
+      email,
       password: hashedPassword,
       refreshToken: hashedRefreshToken,
     });
@@ -44,13 +45,16 @@ export class UserRepository {
       if (error.code === '23505') {
         throw new ConflictException('Username already exists ');
       } else {
-        throw new InternalServerErrorException();
+        throw new InternalServerErrorException('this is internal server error');
       }
     }
-    return { accessToken, refreshToken };
-  }
 
-  async findUser(username: string) {
-    return await this.userRepository.findOneBy({ username });
+    const payLoad: JwtPayload = {
+      sub: user.id,
+    };
+
+    const accessToken = this.jwtService.sign(payLoad);
+
+    return { accessToken, refreshToken };
   }
 }
