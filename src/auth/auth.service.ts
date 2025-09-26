@@ -8,10 +8,11 @@ import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import bcrypt from 'bcrypt';
 
+import { AuthCredentialsDto } from './dto/auth-credentials.dto';
+
 import { User } from './user.entity';
 import { UserRepository } from './auth.repo';
 import { JwtPayload } from './jwt-payload.interface';
-import { SignInDto, SignupDto } from './dto/auth-credentials.dto';
 
 @Injectable()
 export class AuthService {
@@ -20,20 +21,15 @@ export class AuthService {
     private readonly userRepository: Repository<User>,
     private readonly jwtService: JwtService,
     private readonly userRepo: UserRepository,
-  ) { }
+  ) {}
 
-  async signUp(dto: SignupDto) {
-    return this.userRepo.signUp(dto)
+  async signUp(authCredentialsDto: AuthCredentialsDto) {
+    return await this.userRepo.signUp(authCredentialsDto);
   }
+  async signIn(authCredentialsDto: AuthCredentialsDto) {
+    const { username, password } = authCredentialsDto;
 
-  async signIn(dto: SignInDto) {
-    const { username, email, password } = dto;
-
-    const user = await this.userRepository.findOne({
-      where: [{ username }, { email }],
-    });
-
-    console.log(password)
+    const user = await this.userRepository.findOneBy({ username });
 
     if (!user) throw new UnauthorizedException('invalid credentials');
 
@@ -41,7 +37,7 @@ export class AuthService {
 
     if (!isMatch) throw new BadRequestException('password error. try again');
 
-    const payLoad: JwtPayload = { sub: user.id };
+    const payLoad: JwtPayload = { username };
     const accessToken = this.jwtService.sign(payLoad);
 
     const refreshToken = crypto.randomUUID();
@@ -51,8 +47,8 @@ export class AuthService {
     await this.userRepository.update(user.id, {
       refreshToken: hashedRefreshToken,
     });
-    return { accessToken, refreshToken }
 
+    return { accessToken, refreshToken };
   }
 
   async refresh(refreshToken: string, user: User) {
@@ -63,14 +59,7 @@ export class AuthService {
     const isMatch = await bcrypt.compare(refreshToken, found.refreshToken);
 
     if (!isMatch) throw new BadRequestException('refresh token is not valid');
-
-    const payLoad: JwtPayload = { sub: user.id };
-    const accessToken = this.jwtService.sign(payLoad);
-
-    return { accessToken };
   }
-
-
 
   async logout(user: User) {
     await this.userRepository.update(user.id, { refreshToken: null });

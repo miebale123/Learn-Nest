@@ -1,19 +1,13 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Task } from 'src/tasks/task.entity';
-import { IsOptional } from 'class-validator';
 
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn()
   id: string;
 
-  @Column({ type: 'varchar', unique: true, nullable: true })
-  @IsOptional()
+  @Column({ unique: true })
   username: string;
-
-  @Column({ type: 'varchar', unique: true, nullable: true })
-  @IsOptional()
-  email: string;
 
   @Column()
   password: string;

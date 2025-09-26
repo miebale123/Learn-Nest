@@ -25,7 +25,7 @@ export const envSchema = z.object({
   DB_USER: z.string().trim().min(1, 'DB_USER is required').readonly(),
   DB_PASSWORD: z.string().trim().min(1, 'DB_PASSWORD is required').readonly(),
   DB_NAME: z.string().trim().min(1, 'DB_NAME is required').readonly(),
-
+  
   DB_SYNCHRONIZE: z
     .preprocess(
       (val) => (typeof val === 'string' ? val.toLowerCase() === 'true' : val),
@@ -33,20 +33,12 @@ export const envSchema = z.object({
     )
     .default(false)
     .readonly(),
-
+  
   DB_LOGGING: z
     .preprocess(
       (val) => (typeof val === 'string' ? val.toLowerCase() === 'true' : val),
       z.boolean(),
     )
     .default(false)
-    .readonly(),
-
-  AUTOLOADENTITIES: z
-    .preprocess(
-      (val) => (typeof val === 'string' ? val.toLowerCase() === 'true' : val),
-      z.boolean(),
-    )
-    .default(true)
     .readonly(),
 });
