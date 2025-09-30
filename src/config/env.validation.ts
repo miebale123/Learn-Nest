@@ -1,5 +1,16 @@
 import z from 'zod';
 
+const RequiredString = (message: string) =>
+  z.string().trim().min(1, message).readonly();
+
+const BooleanFromString = (defaultValue: boolean) =>
+  z.preprocess(
+    (val) => (typeof val === 'string' ? val.trim().toLowerCase() === 'true' : val),
+    z.boolean(),
+  )
+    .default(defaultValue)
+    .readonly();
+
 export const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'staging', 'production']),
 
@@ -14,31 +25,21 @@ export const envSchema = z.object({
 
   BCRYPT_SALT_ROUNDS: z.coerce
     .number()
+    .int()
     .positive()
     .min(10, 'salt at least must be 10')
+    .max(20, 'salt should not exceed 20')
     .readonly(),
 
-  SECRET: z.string().min(1, 'secret required').readonly(),
+  JWT_SECRET: RequiredString('secret is required'),
+  JWT_EXPIRES_IN: z.string().default('15m'),
 
-  DB_HOST: z.string().trim().min(1, 'DB_HOST is required').readonly(),
   DB_PORT: z.coerce.number().int().positive().min(1).max(65535).readonly(),
-  DB_USER: z.string().trim().min(1, 'DB_USER is required').readonly(),
-  DB_PASSWORD: z.string().trim().min(1, 'DB_PASSWORD is required').readonly(),
-  DB_NAME: z.string().trim().min(1, 'DB_NAME is required').readonly(),
-  
-  DB_SYNCHRONIZE: z
-    .preprocess(
-      (val) => (typeof val === 'string' ? val.toLowerCase() === 'true' : val),
-      z.boolean(),
-    )
-    .default(false)
-    .readonly(),
-  
-  DB_LOGGING: z
-    .preprocess(
-      (val) => (typeof val === 'string' ? val.toLowerCase() === 'true' : val),
-      z.boolean(),
-    )
-    .default(false)
-    .readonly(),
+  DB_HOST: RequiredString('DB_HOST is required'),
+  DB_USER: RequiredString('DB_USER is required'),
+  DB_PASSWORD: RequiredString('DB_PASSWORD is required'),
+  DB_NAME: RequiredString('DB_NAME is required'),
+  DB_SYNCHRONIZE: BooleanFromString(false),
+  DB_LOGGING: BooleanFromString(false),
+  AUTOLOADENTITIES: BooleanFromString(true),
 });

@@ -8,6 +8,8 @@ export const configuration = registerAs('config', () => {
     return {
       nodeEnv: validated.NODE_ENV,
       port: validated.PORT,
+      jwt_secret: validated.JWT_SECRET,
+      jwt_expiry: validated.JWT_EXPIRES_IN,
 
       database: {
         host: validated.DB_HOST,
@@ -17,6 +19,7 @@ export const configuration = registerAs('config', () => {
         name: validated.DB_NAME,
         synchronize: validated.DB_SYNCHRONIZE,
         logging: validated.DB_LOGGING,
+        autoLoadEntities: validated.AUTOLOADENTITIES,
       },
     };
   } catch (err: unknown) {

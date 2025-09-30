@@ -1,24 +1,27 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn, Unique } from 'typeorm';
 import { Task } from 'src/tasks/task.entity';
-
+@Unique(['email'])
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn()
-  id: string;
+  id: number;
 
-  @Column({ unique: true })
-  username: string;
+  @Column({ type: 'varchar', unique: true, nullable: false })
+  email: string;
 
   @Column()
   password: string;
 
-  @Column({ nullable: true })
-  accessToken: string;
+  @Column({ type: 'text', nullable: true })
+  refreshToken?: string | null;
 
   @Column({ type: 'text', nullable: true })
-  refreshToken: string | null;
+  resetToken?: string | null;
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  @Column({ type: 'timestamp', nullable: true })
+  resetTokenExpiry?: Date | null;
+
   @OneToMany((type) => Task, (task) => task.user, { eager: true })
   tasks: Task[];
+
 }

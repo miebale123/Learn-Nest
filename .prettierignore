@@ -1,0 +1,5 @@
+# Ignore artifacts:
+build
+coverage
+
+node --eval "fs.writeFileSync('.prettierignore','# Ignore artifacts:\nbuild\ncoverage\n')"
