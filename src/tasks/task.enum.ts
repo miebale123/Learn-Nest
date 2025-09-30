@@ -29,4 +29,3 @@ export class TaskStatusValidationPipe implements PipeTransform {
     return idx;
   }
 }
-

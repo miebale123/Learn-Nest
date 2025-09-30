@@ -18,5 +18,6 @@ export const typeOrmConfig = (
     database: config.database.name,
     synchronize: config.database.synchronize,
     logging: config.database.logging,
+    autoLoadEntities: config.database.autoLoadEntities,
   };
 };
