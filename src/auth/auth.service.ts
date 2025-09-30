@@ -42,10 +42,7 @@ export class AuthService {
     // Create a new user from Google data
     user = this.userRepository.create({
       email,
-      firstName,
-      lastName,
       password: null, // no local password for Google users
-      picture,
       provider: 'google',
       providerId,
     });

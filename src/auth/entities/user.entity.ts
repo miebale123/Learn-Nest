@@ -10,16 +10,7 @@ export class User {
   @Column({ type: 'varchar', unique: true, nullable: false })
   email: string;
 
-  @Column({ nullable: true })
-  firstName: string | null;
-
-  @Column({ nullable: true })
-  lastName: string | null;
-
-  @Column({ type: 'varchar', nullable: true })
-  picture?: string | null;
-
-  @Column({ nullable: true }) // nullable because OAuth users might not have a password
+  @Column({ type: 'text', nullable: true }) // nullable because OAuth users might not have a password
   password?: string | null;
 
   @Column({ type: 'text', nullable: true })
