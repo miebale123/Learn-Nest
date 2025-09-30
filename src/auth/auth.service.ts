@@ -2,7 +2,9 @@ import * as nodemailer from 'nodemailer';
 import * as crypto from 'crypto';
 import {
   BadRequestException,
+  ConflictException,
   Injectable,
+  InternalServerErrorException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -10,9 +12,7 @@ import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 
-import { User } from './user.entity';
 import { UserRepository } from './auth.repo';
-import { JwtPayload } from './interfaces/jwt-payload.interface';
 import {
   ForgotPasswordDto,
   ResetPasswordDto,
@@ -20,7 +20,8 @@ import {
   SignupDto,
   UpdatePasswordDto,
 } from './dto';
-import { AuthInternal } from './interfaces/AuthInternal.interface';
+import { AuthInternal, JwtPayload } from './interfaces';
+import { User } from './entities';
 
 @Injectable()
 export class AuthService {
@@ -31,15 +32,54 @@ export class AuthService {
     private readonly userRepo: UserRepository,
   ) { }
 
+  async googleLogin(googleUser: any): Promise<AuthInternal> {
+    const { email, firstName, lastName, providerId, picture } = googleUser;
+
+    // Check if user already exists
+    let user = await this.userRepository.findOne({ where: { email } });
+
+    if (user) throw new ConflictException('user already exists');
+    // Create a new user from Google data
+    user = this.userRepository.create({
+      email,
+      firstName,
+      lastName,
+      password: null, // no local password for Google users
+      picture,
+      provider: 'google',
+      providerId,
+    });
+
+
+    await this.userRepository.save(user);
+    // Issue JWT + refresh token
+    const payload: JwtPayload = { sub: user.id };
+    const accessToken = this.jwtService.sign(payload);
+
+    const refreshToken = crypto.randomUUID();
+    const hashed = await bcrypt.hash(refreshToken, 12);
+    await this.userRepository.update(user.id, { refreshToken: hashed });
+
+    return {
+      accessToken,
+      refreshToken,
+      message: 'Signed in with Google successfully',
+    };
+  }
+
+
   async signUp(dto: SignupDto): Promise<AuthInternal> {
     return this.userRepo.signUp(dto);
   }
+
 
   async signIn(dto: SignInDto): Promise<AuthInternal> {
     const { email, password } = dto;
     const user = await this.userRepository.findOne({ where: { email } });
 
-    if (!user) throw new UnauthorizedException('Invalid credentials');
+    if (!user) throw new UnauthorizedException('');
+
+    if (!user.password) throw new InternalServerErrorException()
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) throw new BadRequestException('Incorrect password');
@@ -85,8 +125,13 @@ export class AuthService {
 
   async updatePassword(user: User, dto: UpdatePasswordDto): Promise<void> {
     const { oldPassword, newPassword } = dto;
+
+    if (!user.password) throw new InternalServerErrorException()
     const isMatch = await bcrypt.compare(oldPassword, user.password);
     if (!isMatch) throw new BadRequestException('Old password is incorrect');
+
+    if (oldPassword === newPassword)
+      throw new ConflictException('your old and new password can not be the same')
 
     user.password = await bcrypt.hash(newPassword, 12);
     await this.userRepository.save(user);

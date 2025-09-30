@@ -7,12 +7,11 @@ import { AuthService } from './auth.service';
 import { APP_GUARD } from '@nestjs/core';
 import { ConfigType } from '@nestjs/config';
 import { UserRepository } from './auth.repo';
-import { User } from './user.entity';
 import { JwtStrategy } from './strategies/jwt.strategy';
-import { configuration } from '../config/configuration'
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
-import { ThrottlerModule } from '@nestjs/throttler';
-
+import { configuration } from '../config/app.config'
+import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
+import { User } from './entities';
+import { GoogleStrategy } from './strategies/google.strategy';
 
 @Module({
   imports: [
@@ -25,13 +24,11 @@ import { ThrottlerModule } from '@nestjs/throttler';
         secret: config.jwt_secret,
         signOptions: { expiresIn: config.jwt_expiry },
       }),
-    
     }),
-
   ],
 
   controllers: [AuthController],
-  providers: [AuthService, UserRepository, JwtStrategy, {
+  providers: [AuthService, UserRepository, JwtStrategy, GoogleStrategy, {
     provide: APP_GUARD,
     useClass: JwtAuthGuard,
   },],

@@ -7,16 +7,16 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { FilterTaskDto, CreateTaskDto } from './dto';
-import { User } from 'src/auth/user.entity';
-import { Task } from './task.entity';
+import { User } from 'src/auth/entities/user.entity';
 import { TaskStatus } from './task.enum';
+import { Task } from './entities';
 
 @Injectable()
 export class TasksRepository {
   constructor(
     @InjectRepository(Task)
     private readonly taskRepository: Repository<Task>,
-  ) {}
+  ) { }
 
   logger = new Logger('TaskRepository');
 

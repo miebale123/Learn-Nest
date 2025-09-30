@@ -5,15 +5,15 @@ import { Repository } from 'typeorm';
 import { CreateTaskDto, FilterTaskDto } from './dto';
 import { TaskStatus } from './task.enum';
 import { TasksRepository } from './task.repository';
-import { Task } from './task.entity';
-import { User } from 'src/auth/user.entity';
+import { User } from 'src/auth';
+import { Task } from './entities';
 @Injectable()
 export class TasksService {
   constructor(
     @InjectRepository(Task)
     private taskRepo: Repository<Task>,
     private readonly taskRepository: TasksRepository,
-  ) {}
+  ) { }
 
   async createTask(createTaskDto: CreateTaskDto, user: User): Promise<Task> {
     return this.taskRepository.createTask(createTaskDto, user);

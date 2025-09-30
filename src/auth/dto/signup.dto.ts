@@ -1,6 +1,6 @@
 import { Transform } from "class-transformer";
 import { IsEmail } from "class-validator";
-import { PasswordRules } from "./auth-rules";
+import { PasswordRules } from "../decorators/password-rules.decorator";
 
 export class SignupDto {
   @Transform(

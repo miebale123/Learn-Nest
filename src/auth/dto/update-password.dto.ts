@@ -1,5 +1,5 @@
 import { IsString } from "class-validator";
-import { PasswordRules } from "./auth-rules";
+import { PasswordRules } from "../decorators/password-rules.decorator";
 
 export class UpdatePasswordDto {
   @IsString({ message: 'old password required' })

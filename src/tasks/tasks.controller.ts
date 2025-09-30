@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { TaskStatus } from './task.enum';
-import { Task } from './task.entity';
+import { Task } from './entities';
 
 class CreateTaskDto {
   title: string;

@@ -1,17 +1,35 @@
-import { Body, Controller, HttpCode, HttpStatus, Param, Patch, Post, Res, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Patch, Post, Req, Res, UseGuards, UseInterceptors } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import type { Response } from 'express';
 
 import { AuthService } from './auth.service';
 import { SignupDto, SignInDto, UpdatePasswordDto, ForgotPasswordDto, ResetPasswordDto } from './dto';
-import { AuthInternal } from './interfaces/AuthInternal.interface';
-import { GetRefreshToken, GetUser, Public } from './decorators';
-import { User } from './user.entity';
-import { SetRefreshTokenCookieInterceptor } from './interceptors/cookie.interceptor';
+import { GetRefreshToken, GetUser } from './decorators';
+import type { AuthInternal, GoogleRequest } from './interfaces';
+import { SetRefreshTokenCookieInterceptor } from './interceptors';
+import { Public } from 'src/common/decorators';
+import { User } from './entities';
+import { AuthGuard } from '@nestjs/passport';
+
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) { }
+
+  // STEP 1: Redirect to Google login page
+  @Get('google')
+  @UseGuards(AuthGuard('google'))
+  async googleAuth() { }
+
+  // STEP 2: Handle Google redirect callback
+  @Get('google/callback')
+  @UseGuards(AuthGuard('google'))
+  async googleAuthRedirect(@Req() req: GoogleRequest) {
+
+    const googleUser = req.user;
+
+    return await this.authService.googleLogin(googleUser);
+  }
 
   @Public()
   @HttpCode(HttpStatus.CREATED)
@@ -21,6 +39,7 @@ export class AuthController {
     return this.authService.signUp(dto);
   }
 
+
   @Public()
   @Throttle({ default: { limit: 60000, ttl: 5 } })
   @UseInterceptors(SetRefreshTokenCookieInterceptor)
@@ -29,7 +48,9 @@ export class AuthController {
     return this.authService.signIn(dto);
   }
 
+
   @Throttle({ default: { limit: 60000, ttl: 3 } })
+  @UseInterceptors(SetRefreshTokenCookieInterceptor)
   @Post('refresh')
   async refresh(
     @GetUser() user: User,
@@ -60,6 +81,7 @@ export class AuthController {
     return { message: 'logged out succesfully' }
   }
 
+
   @Public()
   @Post('forgot-password')
   async forgotPassword(
@@ -68,6 +90,7 @@ export class AuthController {
     await this.authService.forgotPassword(dto);
     return { message: 'Password reset link sent to your email.' };
   }
+
 
   @Public()
   @Post('reset-password/:resetToken')

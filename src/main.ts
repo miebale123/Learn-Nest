@@ -1,11 +1,11 @@
 import { NestFactory } from '@nestjs/core';
 import { ConfigType } from '@nestjs/config';
-import { configuration } from './config/configuration';
+import { configuration } from './config/app.config';
 import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
+import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
-import { GlobalExceptionFilter } from './filters/global-exception.filter';
+import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -15,25 +15,21 @@ async function bootstrap() {
   app.useGlobalFilters(new GlobalExceptionFilter())
   app.useGlobalPipes(
     new ValidationPipe({
-      transform: true,
-      whitelist: true,
-      forbidNonWhitelisted: true,
-      // exceptionFactory: (errors) => {
-      //   const formattedErrors = {};
-      //   errors.forEach((err) => {
-      //     const field = err.property;
-      //     const messages = err.constraints
-      //       ? Object.values(err.constraints)
-      //       : [];
-      //     formattedErrors[field] = messages.join(', ');
-      //   });
-
-      //   return new BadRequestException({
-      //     formattedErrors,
-      //   });
-      // },
-    }),
+      exceptionFactory: (errors) => {
+        const formattedErrors = errors.map(err => {
+          return {
+            field: err.property,
+            messages: Object.values(err.constraints || {})
+          };
+        });
+        return new BadRequestException({
+          error: 'ValidationError',
+          message: formattedErrors
+        });
+      }
+    })
   );
+
 
   const config = app.get<ConfigType<typeof configuration>>(configuration.KEY);
   app.enableShutdownHooks();

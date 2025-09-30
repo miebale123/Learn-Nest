@@ -9,3 +9,6 @@ export * from './decorators'
 
 // Interceptors
 export * from './interceptors'
+
+// entities
+export * from './entities'

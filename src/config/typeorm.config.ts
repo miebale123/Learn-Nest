@@ -1,5 +1,5 @@
 import { ConfigType } from '@nestjs/config';
-import { configuration } from './configuration';
+import { configuration } from './app.config';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 
 export const typeOrmConfig = (
