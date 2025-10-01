@@ -7,7 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { FilterTaskDto, CreateTaskDto } from './dto';
-import { User } from 'src/auth/entities/user.entity';
+import { User } from 'src/users/entities/user.entity';
 import { TaskStatus } from './task.enum';
 import { Task } from './entities';
 

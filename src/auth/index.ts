@@ -11,4 +11,7 @@ export * from './decorators'
 export * from './interceptors'
 
 // entities
-export * from './entities'
+export * from '../users/entities'
+
+// module
+export * from './auth.module'

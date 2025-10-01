@@ -4,13 +4,16 @@ import {
     ArgumentsHost,
     HttpException,
     HttpStatus,
-    Logger,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
+import { PinoLogger } from 'nestjs-pino';
 
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {
-    private readonly logger = new Logger(GlobalExceptionFilter.name);
+    constructor(private readonly logger: PinoLogger) {
+        this.logger.setContext(GlobalExceptionFilter.name);
+    }
+
     private readonly isDev = process.env.NODE_ENV === 'development';
 
     private readonly safeMessages: Record<string, string> = {
@@ -54,37 +57,30 @@ export class GlobalExceptionFilter implements ExceptionFilter {
                 }
             }
         } else if (exception instanceof Error) {
-            message = this.isDev
-                ? exception.message
-                : this.safeMessages.InternalServerErrorException;
+            message = this.isDev ? exception.message : this.safeMessages.InternalServerErrorException;
         }
 
-        const path = request.url;
-        const method = request.method;
-        const logMessage = `${method} ${path} → ${JSON.stringify(message)}`;
+        const logPayload = {
+            statusCode: status,
+            path: request.url,
+            method: request.method,
+            errorType,
+            message,
+            timestamp: new Date().toISOString(),
+        };
 
-        // 🔹 Always log stack trace internally (but not in Postman)
-        if (exception instanceof Error) {
-            this.logger.error(`[${errorType}] ${logMessage}`, exception.stack);
-        } else if (status >= 500) {
-            this.logger.error(`[${errorType}] ${logMessage}`);
+        if (status >= 500) {
+            this.logger.error({ err: exception, ...logPayload });
         } else if (status >= 400) {
-            this.logger.warn(`[${errorType}] ${logMessage}`);
+            this.logger.warn(logPayload);
         } else {
-            this.logger.log(`[${errorType}] ${logMessage}`);
+            this.logger.info(logPayload);
         }
 
-        if (this.isDev) {
-            if (path.startsWith('/auth')) this.logger.verbose(`[AUTH ERROR] ${logMessage}`);
-            else if (path.startsWith('/tasks')) this.logger.verbose(`[TASKS ERROR] ${logMessage}`);
-            else if (path.startsWith('/users')) this.logger.verbose(`[USERS ERROR] ${logMessage}`);
-        }
-
-        // 🔹 Client gets safe response (no stack trace)
         response.status(status).json({
             success: false,
             statusCode: status,
-            path,
+            path: request.url,
             timestamp: new Date().toISOString(),
             error: errorType,
             message,

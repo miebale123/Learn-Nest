@@ -6,6 +6,7 @@ export const configuration = registerAs('config', () => {
   try {
     const validated = envSchema.parse(process.env);
     return {
+      frontEndUrl: process.env.FRONT_END_URL,
       nodeEnv: validated.NODE_ENV,
       port: validated.PORT,
       jwt_secret: validated.JWT_SECRET,

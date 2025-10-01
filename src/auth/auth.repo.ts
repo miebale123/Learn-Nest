@@ -13,7 +13,7 @@ import crypto from 'crypto';
 
 import { SignupDto } from './dto';
 import { AuthInternal, JwtPayload } from './interfaces';
-import { User } from './entities';
+import { User } from '../users/entities';
 
 @Injectable()
 export class UserRepository {

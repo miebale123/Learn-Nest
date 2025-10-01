@@ -8,8 +8,9 @@ import { GetRefreshToken, GetUser } from './decorators';
 import type { AuthInternal, GoogleRequest } from './interfaces';
 import { SetRefreshTokenCookieInterceptor } from './interceptors';
 import { Public } from 'src/common/decorators';
-import { User } from './entities';
+import { User } from '../users/entities';
 import { AuthGuard } from '@nestjs/passport';
+import { AuditExclude } from 'src/audit/audit-exclude.decorator';
 
 
 @Controller('auth')
@@ -34,6 +35,7 @@ export class AuthController {
   @Public()
   @HttpCode(HttpStatus.CREATED)
   @UseInterceptors(SetRefreshTokenCookieInterceptor)
+  @AuditExclude()
   @Post('sign-up')
   async signUp(@Body() dto: SignupDto): Promise<AuthInternal> {
     return this.authService.signUp(dto);
@@ -43,13 +45,14 @@ export class AuthController {
   @Public()
   @Throttle({ default: { limit: 60000, ttl: 5 } })
   @UseInterceptors(SetRefreshTokenCookieInterceptor)
+  @AuditExclude()
   @Post('sign-in')
   async signIn(@Body() dto: SignInDto): Promise<AuthInternal> {
     return this.authService.signIn(dto);
   }
 
 
-  @Throttle({ default: { limit: 60000, ttl: 3 } })
+  @Throttle({ default: { limit: 60000, ttl: 5 } })
   @UseInterceptors(SetRefreshTokenCookieInterceptor)
   @Post('refresh')
   async refresh(

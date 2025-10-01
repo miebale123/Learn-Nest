@@ -1,8 +1,9 @@
 import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from "@nestjs/common";
 import { Response } from "express";
-import { map, Observable} from "rxjs";
+import { map, Observable } from "rxjs";
 import { AuthResponseDto } from "../dto/auth-response.dto";
 import { AuthInternal } from "../interfaces/AuthInternal.interface";
+import { setRefreshTokenCookie } from "src/common/utils/cookie.util";
 
 @Injectable()
 export class SetRefreshTokenCookieInterceptor implements NestInterceptor {
@@ -11,13 +12,9 @@ export class SetRefreshTokenCookieInterceptor implements NestInterceptor {
     const response = ctx.getResponse<Response>();
 
     return next.handle().pipe(
-      map((data: AuthInternal): AuthResponseDto => {  
-        response.cookie('refresh-token', data.refreshToken, {
-          httpOnly: true,
-          sameSite: 'strict',
-          secure: process.env.NODE_ENV === 'production',
-          maxAge: 7 * 24 * 60 * 60 * 1000,
-        });
+      map((data: AuthInternal): AuthResponseDto => {
+
+        setRefreshTokenCookie(response, data.refreshToken)
 
         delete data?.refreshToken
 

@@ -2,14 +2,20 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 
-import { configuration } from './config/app.config';
-import { typeOrmConfig } from './config/typeorm.config';
-import { TasksModule } from './tasks/tasks.module';
-import { AuthModule } from './auth/auth.module';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { configuration, typeOrmConfig } from './config';
+import { TasksModule } from './tasks';
+import { AuthModule } from './auth';
+import { AuditModule } from './audit/audit.module';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { AuditInterceptor } from './audit/audit.interceptor';
+import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
+import { LoggerModule } from 'nestjs-pino';
+import { randomUUID } from 'crypto';
 
 @Module({
   imports: [
+
     ConfigModule.forRoot({
       isGlobal: true,
       load: [configuration],
@@ -25,14 +31,40 @@ import { ThrottlerModule } from '@nestjs/throttler';
       inject: [configuration.KEY],
       useFactory: typeOrmConfig,
     }),
-    TasksModule,
-    AuthModule,
+
     ThrottlerModule.forRoot({
-      throttlers: [
-        { ttl: 60000, limit: 5 }
-      ]
+      throttlers: []
+    }),
+    LoggerModule.forRoot({
+      pinoHttp: {
+        genReqId: () => randomUUID(),
+        level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
+        transport:
+          process.env.NODE_ENV === 'production'
+            ? undefined
+            : {
+              target: 'pino-pretty',
+              options: {
+                colorize: true,
+                translateTime: 'HH:MM:ss',
+                ignore: 'pid,hostname',
+              },
+            },
+        redact: ['req.headers.authorization', 'req.headers.cookie'],
+      },
     })
+    ,
+    AuditModule,
+    AuthModule,
+    TasksModule,
+
   ],
-  // controllers: [test],
+  providers: [
+    GlobalExceptionFilter,
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: AuditInterceptor
+    },
+  ],
 })
 export class AppModule { }

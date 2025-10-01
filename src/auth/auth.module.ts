@@ -6,18 +6,19 @@ import { AuthController, } from './auth.controller';
 import { AuthService } from './auth.service';
 import { APP_GUARD } from '@nestjs/core';
 import { ConfigType } from '@nestjs/config';
-import { UserRepository } from './auth.repo';
-import { JwtStrategy } from './strategies/jwt.strategy';
 import { configuration } from '../config/app.config'
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
-import { User } from './entities';
-import { GoogleStrategy } from './strategies/google.strategy';
+import { User } from '../users/entities';
+import { MailModule } from 'src/mail/mail.module';
+import { MailService } from 'src/mail/mail.service';
+import { UsersService } from 'src/users/users.service';
+import { GoogleStrategy, JwtStrategy } from './strategies';
+import { UsersModule } from 'src/users/users.module';
 
 @Module({
   imports: [
     PassportModule.register({ defaultStrategy: 'jwt' }),
     TypeOrmModule.forFeature([User]),
-
     JwtModule.registerAsync({
       inject: [configuration.KEY],
       useFactory: (config: ConfigType<typeof configuration>) => ({
@@ -25,13 +26,15 @@ import { GoogleStrategy } from './strategies/google.strategy';
         signOptions: { expiresIn: config.jwt_expiry },
       }),
     }),
+    UsersModule,    
+    MailModule
   ],
 
   controllers: [AuthController],
-  providers: [AuthService, UserRepository, JwtStrategy, GoogleStrategy, {
+  providers: [AuthService, JwtStrategy, GoogleStrategy, {
     provide: APP_GUARD,
     useClass: JwtAuthGuard,
-  },],
-  exports: [PassportModule, UserRepository],
+  }, MailService, UsersService],
+  exports: [PassportModule],
 })
 export class AuthModule { }
