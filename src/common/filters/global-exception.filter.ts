@@ -3,61 +3,50 @@ import {
     Catch,
     ArgumentsHost,
     HttpException,
-    HttpStatus,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { PinoLogger } from 'nestjs-pino';
 
+interface ExceptionResponse {
+    message?: string | string[];
+    [key: string]: any;
+}
+
+
+// we should sanitize 5xx errors, stack traces.... from being sent to client.
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {
     constructor(private readonly logger: PinoLogger) {
         this.logger.setContext(GlobalExceptionFilter.name);
     }
 
-    private readonly isDev = process.env.NODE_ENV === 'development';
-
-    private readonly safeMessages: Record<string, string> = {
-        BadRequestException: 'Invalid input provided',
-        UnauthorizedException: 'Authentication failed',
-        NotFoundException: 'Resource not found',
-        ForbiddenException: 'Access denied',
-        ConflictException: 'Request conflict',
-        RequestTimeoutException: 'Request timed out',
-        ServiceUnavailableException: 'Service unavailable',
-        GatewayTimeoutException: 'Gateway timed out',
-        InternalServerErrorException: 'An unexpected error occurred',
-    };
-
     catch(exception: unknown, host: ArgumentsHost): void {
         const ctx = host.switchToHttp();
         const response = ctx.getResponse<Response>();
         const request = ctx.getRequest<Request>();
 
-        let status: number = HttpStatus.INTERNAL_SERVER_ERROR;
+        // we use these for fallback if not provided
+        let status = 500;
         let errorType = 'InternalServerErrorException';
-        let message: any = this.safeMessages.InternalServerErrorException;
+        let message: string | string[] = 'An unexpected error occurred';
 
+        
         if (exception instanceof HttpException) {
             status = exception.getStatus();
-            const res = exception.getResponse();
             errorType = exception.constructor.name;
 
+            const res = exception.getResponse();
+
             if (typeof res === 'string') {
-                message = this.isDev ? res : this.safeMessages[errorType] || res;
-            } else if (typeof res === 'object' && res !== null) {
-                const obj = res as Record<string, any>;
-                if (Array.isArray(obj.message)) {
-                    message = this.isDev ? obj.message : this.safeMessages.BadRequestException;
-                    errorType = obj.error || 'BadRequestException';
-                } else if (typeof obj.message === 'string') {
-                    message = this.isDev ? obj.message : this.safeMessages[errorType] || obj.message;
-                    errorType = obj.error || errorType;
-                } else if (obj.error) {
-                    errorType = obj.error;
-                }
+                message = res;
+            } else if (res && typeof res === 'object' && 'message' in res) {
+                const obj = res as ExceptionResponse;
+                message = obj.message ?? 'An unexpected error occurred';
+            } else {
+                message = 'An unexpected error occurred';
             }
         } else if (exception instanceof Error) {
-            message = this.isDev ? exception.message : this.safeMessages.InternalServerErrorException;
+            message = exception.message;
         }
 
         const logPayload = {
@@ -69,13 +58,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
             timestamp: new Date().toISOString(),
         };
 
-        if (status >= 500) {
-            this.logger.error({ err: exception, ...logPayload });
-        } else if (status >= 400) {
-            this.logger.warn(logPayload);
-        } else {
-            this.logger.info(logPayload);
-        }
+        this.logger.error({ err: exception, ...logPayload });
 
         response.status(status).json({
             success: false,

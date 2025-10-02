@@ -57,7 +57,7 @@ export class AuthService {
   async signIn(dto: SignInDto): Promise<AuthInternal> {
     const user = await this.usersService.findByEmail(dto.email);
     if (!user) throw new UnauthorizedException('User not found');
-    if (!user.password) throw new InternalServerErrorException('No password set for user');
+    if (!user.password) throw new BadRequestException('No password set for user');
 
     const isMatch = await bcrypt.compare(dto.password, user.password);
     if (!isMatch) throw new BadRequestException('Incorrect password');
@@ -94,7 +94,7 @@ export class AuthService {
   async updatePassword(user: User, dto: UpdatePasswordDto): Promise<void> {
     const { oldPassword, newPassword } = dto;
 
-    if (!user.password) throw new InternalServerErrorException('No password set for user');
+    if (!user.password) throw new BadRequestException('No password set for user');
 
     const isMatch = await bcrypt.compare(oldPassword, user.password);
     if (!isMatch) throw new BadRequestException('Old password is incorrect');

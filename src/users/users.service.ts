@@ -34,7 +34,7 @@ export class UsersService {
             if (error.code === '23505') {
                 throw new ConflictException('Email already exists');
             } else {
-                throw new InternalServerErrorException('Internal server error');
+                throw new InternalServerErrorException();
             }
         }
     }

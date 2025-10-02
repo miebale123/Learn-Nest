@@ -48,7 +48,7 @@ export class UserRepository {
       if (error.code === '23505') {
         throw new ConflictException('email already exists ');
       } else {
-        throw new InternalServerErrorException('this is internal server error');
+        throw new InternalServerErrorException();
       }
     }
 
