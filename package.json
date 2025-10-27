@@ -5,6 +5,7 @@
   "author": "",
   "private": true,
   "license": "UNLICENSED",
+  "engines": {"node": "20.x"},
   "scripts": {
     "build": "nest build",
     "vercel-build": "NODE_ENV=development tsc && cp -r src/vercel.ts dist/vercel.js",
