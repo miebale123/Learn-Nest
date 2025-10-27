@@ -2,7 +2,7 @@
   "version": 2,
   "functions": {
     "api/index.ts": {
-      "runtime": "now-node@18"
+      "runtime": "now-node@18.20.8"
     }
   },
   "routes": [{ "src": "/(.*)", "dest": "/api/index.ts" }]
