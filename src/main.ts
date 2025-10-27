@@ -19,11 +19,11 @@ class Appcontroller {}
 @Module({ controllers: [Appcontroller] })
 class AppModule {}
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
-    bufferLogs: true,
-  });
+  // const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+  //   bufferLogs: true,
+  // });
 
-  // const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule);
 
   // const config = app.get<ConfigType<typeof configuration>>(configuration.KEY);
 
