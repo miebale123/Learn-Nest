@@ -6,8 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "build": "nest build",
-    "vercel-build": "tsc && cp -r src/vercel.ts dist/vercel.js",
+    "build": "NODE_ENV=development tsc && cp -r src/vercel.ts dist/vercel.js",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "NODE_ENV=development nest start --watch",
