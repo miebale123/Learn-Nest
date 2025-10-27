@@ -1,16 +1,28 @@
+import { Controller, Module } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { ExpressAdapter } from '@nestjs/platform-express';
-import { AppModule } from './app.module';
-import  express from 'express';
+import express from 'express';
 
 const expressApp = express();
 let cachedServer: express.Express | null = null;
 
+@Controller()
+class AppController {}
+
+@Module({
+  controllers: [AppController],
+})
+class AppModule {}
+
 async function bootstrapServer() {
   if (!cachedServer) {
-    const app = await NestFactory.create(AppModule, new ExpressAdapter(expressApp), {
-      bufferLogs: true,
-    });
+    const app = await NestFactory.create(
+      AppModule,
+      new ExpressAdapter(expressApp),
+      {
+        bufferLogs: true,
+      },
+    );
 
     // Basic global logging (to Vercel logs)
     app.useLogger(['log', 'error', 'warn', 'debug', 'verbose']);
@@ -24,7 +36,10 @@ async function bootstrapServer() {
     // Log environment info (shows once per cold start)
     console.log('🟢 NestJS initialized in serverless mode');
     console.log('📦 Environment:', process.env.NODE_ENV);
-    console.log('🗄️  Database URL:', process.env.DATABASE_URL?.replace(/:(.*?)@/, ':****@'));
+    console.log(
+      '🗄️  Database URL:',
+      process.env.DATABASE_URL?.replace(/:(.*?)@/, ':****@'),
+    );
 
     await app.init();
     cachedServer = expressApp;
