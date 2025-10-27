@@ -8,42 +8,43 @@ import { Logger } from 'nestjs-pino';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import type { ConfigType } from '@nestjs/config';
 import { configuration } from './config/app.config';
-import { AppModule } from './app.module';
+// import { AppModule } from './app.module';
 import { GlobalZodPipe } from './auth/dto/auth.validation';
 import { UsersService } from './users/users.service';
+import { Controller, Module } from '@nestjs/common';
 
+@Controller()
+class Appcontroller {}
+
+@Module({ controllers: [Appcontroller] })
+class AppModule {}
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     bufferLogs: true,
   });
 
-  const config = app.get<ConfigType<typeof configuration>>(configuration.KEY);
+  // const app = await NestFactory.create(AppModule);
 
-  app.enableCors({ origin: config.frontEndUrl, credentials: true });
-  app.enableShutdownHooks();
+  // const config = app.get<ConfigType<typeof configuration>>(configuration.KEY);
 
-  app.use(helmet());
-  app.use(cookieParser());
-  app.useLogger(app.get(Logger));
+  // app.enableCors({ origin: config.frontEndUrl, credentials: true });
+  // app.enableShutdownHooks();
 
-  app.useGlobalPipes(new GlobalZodPipe());
-  app.useGlobalFilters(app.get(GlobalExceptionFilter));
+  // app.use(helmet());
+  // app.use(cookieParser());
+  // app.useLogger(app.get(Logger));
 
-  app.useStaticAssets(join(process.cwd(), 'uploads'), {
-    prefix: '/uploads/',
-    setHeaders: (res) => {
-      res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
-      res.setHeader('Access-Control-Allow-Origin', config.frontEndUrl); // optional but helps
-    },
-  });
+  // app.useGlobalPipes(new GlobalZodPipe());
+  // app.useGlobalFilters(app.get(GlobalExceptionFilter));
 
   // RBAC
-  const adminEmail = process.env.ADMIN_EMAIL!;
-  const adminPass = process.env.ADMIN_PASS!;
+  // const adminEmail = process.env.ADMIN_EMAIL!;
+  // const adminPass = process.env.ADMIN_PASS!;
 
-  const usersService = app.get(UsersService);
-  await usersService.createAdmin(adminEmail, adminPass);
+  // const usersService = app.get(UsersService);
+  // await usersService.createAdmin(adminEmail, adminPass);
 
-  await app.listen(config.port);
+  // await app.listen(config.port);
+  await app.listen(3000);
 }
 bootstrap().catch((err) => console.log(err));
