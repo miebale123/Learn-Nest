@@ -1,6 +1,6 @@
 import type { ConfigType } from '@nestjs/config';
 import type { configuration } from './app.config';
-import type  { TypeOrmModuleOptions } from '@nestjs/typeorm';
+import type { TypeOrmModuleOptions } from '@nestjs/typeorm';
 
 export const typeOrmConfig = (
   config: ConfigType<typeof configuration>,
@@ -16,9 +16,12 @@ export const typeOrmConfig = (
     // port: config.database.port,
     // username: config.database.user,
     // password: config.database.password,
-    database: config.database.name,
+    // database: config.database.name,
     synchronize: config.database.synchronize,
     logging: config.database.logging,
     autoLoadEntities: config.database.autoLoadEntities,
+    ssl: {
+      rejectUnauthorized: false, // Required by Neon
+    },
   };
 };
