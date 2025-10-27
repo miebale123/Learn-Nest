@@ -14,5 +14,13 @@
     "area": "40",
     "bathroom": 2,
     "bedroom": 2
+  },
+  {
+    "id": 217,
+    "url": "/uploads/1761536560137-houseseven.jpg",
+    "location": "mk",
+    "area": "20square",
+    "bathroom": 1,
+    "bedroom": 2
   }
 ]

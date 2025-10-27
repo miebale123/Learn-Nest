@@ -14,7 +14,7 @@ const BooleanFromString = (defaultValue: boolean) =>
     .readonly();
 
 export const envSchema = z.object({
-  NODE_ENV: z.enum(['development', 'staging', 'production']),
+  NODE_ENV: z.enum(['development', 'staging', 'production', 'example']),
 
   PORT: z.coerce
     .number()
@@ -38,6 +38,7 @@ export const envSchema = z.object({
   ADMIN_EMAIL: z.string(),
   ADMIN_PASS: z.string(),
 
+  DB_URL: z.string(),
   DB_PORT: z.coerce.number().int().positive().min(1).max(65535).readonly(),
   DB_HOST: RequiredString('DB_HOST is required'),
   DB_USER: RequiredString('DB_USER is required'),
