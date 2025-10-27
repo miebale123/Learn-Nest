@@ -1,13 +1,19 @@
-import { Controller, Module } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import express from 'express';
+import serverless from 'serverless-http';
+import { Module, Controller, Get } from '@nestjs/common';
 
 const expressApp = express();
-let cachedServer: express.Express | null = null;
+let cachedServer: any = null;
 
 @Controller()
-class AppController {}
+class AppController {
+  @Get()
+  getHello() {
+    return { message: 'Hello from NestJS on Vercel!' };
+  }
+}
 
 @Module({
   controllers: [AppController],
@@ -19,44 +25,25 @@ async function bootstrapServer() {
     const app = await NestFactory.create(
       AppModule,
       new ExpressAdapter(expressApp),
-      {
-        bufferLogs: true,
-      },
+      { bufferLogs: true },
     );
 
-    // Basic global logging (to Vercel logs)
-    app.useLogger(['log', 'error', 'warn', 'debug', 'verbose']);
-
-    // Allow CORS if your frontend is on another domain
     app.enableCors({
       origin: '*',
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     });
 
-    // Log environment info (shows once per cold start)
-    console.log('🟢 NestJS initialized in serverless mode');
-    console.log('📦 Environment:', process.env.NODE_ENV);
-    console.log(
-      '🗄️  Database URL:',
-      process.env.DATABASE_URL?.replace(/:(.*?)@/, ':****@'),
-    );
-
     await app.init();
-    cachedServer = expressApp;
+    cachedServer = serverless(expressApp); // wrap with serverless
   }
   return cachedServer;
 }
 
-// Main Vercel handler
 export default async function handler(req: any, res: any) {
   const server = await bootstrapServer();
 
-  // Request logging
-  console.log(`➡️  ${req.method} ${req.url}`);
-
   try {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    return server(req, res);
+    return server(req, res); // now this is fully compatible
   } catch (error) {
     console.error('❌ Request failed:', error);
     res.status(500).json({ error: 'Internal Server Error' });
