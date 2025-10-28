@@ -14,7 +14,7 @@ async function bootstrap() {
 
   const config = app.get<ConfigType<typeof configuration>>(configuration.KEY);
 
-  app.enableCors({ origin: config.frontEndUrl, credentials: true });
+  app.enableCors({ origin: [config.frontEndLive, config.frontEndLocal], credentials: true });
   app.enableShutdownHooks();
 
   app.use(helmet());
