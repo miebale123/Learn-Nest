@@ -14,10 +14,11 @@ import { typeOrmConfig } from './config/typeorm.config';
 import { AdminModule } from './admin/admin.module';
 import { BookmarksModule } from './bookmarks/bookmarks.module';
 import { UploadModule } from './House/upload.module';
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
+  ConfigModule.forRoot({
       isGlobal: true,
       load: [configuration],
       envFilePath: [`.env.${process.env.NODE_ENV}`, '.env'],
@@ -39,7 +40,7 @@ import { UploadModule } from './House/upload.module';
         transport:
           process.env.NODE_ENV === 'production'
             ? undefined
-            : 
+            : {
                 target: 'pino-pretty',
                 options: {
                   colorize: true,
@@ -55,6 +56,7 @@ import { UploadModule } from './House/upload.module';
     AdminModule,
     BookmarksModule,
     UploadModule,
+    CloudinaryModule
   ],
   providers: [
     GlobalExceptionFilter,

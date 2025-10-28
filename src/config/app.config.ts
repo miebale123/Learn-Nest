@@ -5,6 +5,7 @@ import z from 'zod';
 export const configuration = registerAs('config', () => {
   try {
     const validated = envSchema.parse(process.env);
+
     return {
       frontEndUrl: process.env.FRONTEND_URL,
       nodeEnv: validated.NODE_ENV,
@@ -24,6 +25,12 @@ export const configuration = registerAs('config', () => {
         synchronize: validated.DB_SYNCHRONIZE,
         logging: validated.DB_LOGGING,
         autoLoadEntities: validated.AUTOLOADENTITIES,
+      },
+
+      cloudinary: {
+        cloud_name: process.env.CLOUDINARY_NAME,
+        api_key: process.env.CLOUDINARY_KEY,
+        api_secret: process.env.CLOUDINARY_SECRET,
       },
     };
   } catch (err: unknown) {
