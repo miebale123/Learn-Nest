@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Controller, Get, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { ThrottlerModule } from '@nestjs/throttler';
@@ -13,6 +13,13 @@ import { configuration } from './config/app.config';
 import { typeOrmConfig } from './config/typeorm.config';
 import { AdminModule } from './admin/admin.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
+@Controller()
+class AppController {
+  @Get()
+  root() {
+    return 'hello';
+  }
+}
 
 @Module({
   imports: [
@@ -61,5 +68,6 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
       useClass: AuditInterceptor,
     },
   ],
+  controllers: [AppController],
 })
 export class AppModule {}

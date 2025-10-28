@@ -10,7 +10,7 @@ import { GlobalZodPipe } from './auth/dto/auth.validation';
 import { UsersService } from './users/users.service';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { bufferLogs: true });
 
   const config = app.get<ConfigType<typeof configuration>>(configuration.KEY);
 
