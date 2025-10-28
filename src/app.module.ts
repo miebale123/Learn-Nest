@@ -12,13 +12,11 @@ import { randomUUID } from 'crypto';
 import { configuration } from './config/app.config';
 import { typeOrmConfig } from './config/typeorm.config';
 import { AdminModule } from './admin/admin.module';
-import { BookmarksModule } from './bookmarks/bookmarks.module';
-import { UploadModule } from './House/upload.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
 
 @Module({
   imports: [
-  ConfigModule.forRoot({
+    ConfigModule.forRoot({
       isGlobal: true,
       load: [configuration],
       envFilePath: [`.env.${process.env.NODE_ENV}`, '.env'],
@@ -54,9 +52,7 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
     AuditModule,
     AuthModule,
     AdminModule,
-    BookmarksModule,
-    UploadModule,
-    CloudinaryModule
+    CloudinaryModule,
   ],
   providers: [
     GlobalExceptionFilter,

@@ -1,7 +1,4 @@
 import { NestFactory } from '@nestjs/core';
-import type { NestExpressApplication } from '@nestjs/platform-express';
-import { join } from 'path';
-
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import { Logger } from 'nestjs-pino';
@@ -11,13 +8,8 @@ import { configuration } from './config/app.config';
 import { AppModule } from './app.module';
 import { GlobalZodPipe } from './auth/dto/auth.validation';
 import { UsersService } from './users/users.service';
-import { Controller, Module } from '@nestjs/common';
 
 async function bootstrap() {
-  // const app = await NestFactory.create<NestExpressApplication>(AppModule, {
-  //   bufferLogs: true,
-  // });
-
   const app = await NestFactory.create(AppModule);
 
   const config = app.get<ConfigType<typeof configuration>>(configuration.KEY);
@@ -32,12 +24,9 @@ async function bootstrap() {
   app.useGlobalPipes(new GlobalZodPipe());
   app.useGlobalFilters(app.get(GlobalExceptionFilter));
 
-  const adminEmail = process.env.ADMIN_EMAIL!;
-  const adminPass = process.env.ADMIN_PASS!;
-
   const usersService = app.get(UsersService);
-  await usersService.createAdmin(adminEmail, adminPass);
+  await usersService.createAdmin(config.admin_email, config.admin_pass);
 
-  await app.listen(config.port);
+  await app.listen(config.port ?? 4444, '0.0.0.0');
 }
 bootstrap().catch((err) => console.log(err));
