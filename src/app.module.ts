@@ -20,7 +20,7 @@ class AppController {
   @Public()
   @Get()
   root() {
-    return 'hello';
+    return { message: 'hello ' };
   }
 }
 
