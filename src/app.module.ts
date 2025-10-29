@@ -12,8 +12,8 @@ import { randomUUID } from 'crypto';
 import { configuration } from './config/app.config';
 import { typeOrmConfig } from './config/typeorm.config';
 import { AdminModule } from './admin/admin.module';
-import { CloudinaryModule } from './cloudinary/cloudinary.module';
-@Controller()
+import { HousesModule } from './houses/houses.module';
+@Controller('/')
 class AppController {
   @Get()
   root() {
@@ -59,7 +59,7 @@ class AppController {
     AuditModule,
     AuthModule,
     AdminModule,
-    CloudinaryModule,
+    HousesModule
   ],
   providers: [
     GlobalExceptionFilter,

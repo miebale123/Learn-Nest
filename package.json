@@ -30,7 +30,7 @@
     "@nestjs/throttler": "^6.4.0",
     "@nestjs/typeorm": "^11.0.0",
     "bcrypt": "^6.0.0",
-    "cloudinary": "^2.8.0",
+    "house": "^2.8.0",
     "cookie-parser": "^1.4.7",
     "helmet": "^8.1.0",
     "multer": "^2.0.2",

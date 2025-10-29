@@ -8,7 +8,7 @@ export const configuration = registerAs('config', () => {
 
     return {
       frontEndLive: process.env.FRONTEND_LIVE,
-      frontEndLocal:process.env.FRONTEND_LOCAL,
+      frontEndLocal: process.env.FRONTEND_LOCAL,
       nodeEnv: validated.NODE_ENV,
       port: validated.PORT,
       jwt_secret: validated.JWT_SECRET,
@@ -28,7 +28,7 @@ export const configuration = registerAs('config', () => {
         autoLoadEntities: validated.AUTOLOADENTITIES,
       },
 
-      cloudinary: {
+      house: {
         cloud_name: process.env.CLOUDINARY_NAME,
         api_key: process.env.CLOUDINARY_KEY,
         api_secret: process.env.CLOUDINARY_SECRET,

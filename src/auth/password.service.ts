@@ -8,13 +8,13 @@ import {
 } from '@nestjs/common';
 
 import { UsersService } from 'src/users/users.service';
-import { User } from '../users/entities';
 import { MailService } from 'src/mail/mail.service';
 import {
   ForgotPasswordDto,
   ResetPasswordDto,
   UpdatePasswordDto,
 } from './dto/auth-credentials.dto';
+import { User } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class PasswordService {

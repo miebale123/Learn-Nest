@@ -7,8 +7,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { IsNull, Not, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
-import { User } from './entities';
 import { UserRole } from './user.enum';
+import { User } from './entities/user.entity';
 
 @Injectable()
 export class UsersService {
@@ -39,13 +39,16 @@ export class UsersService {
     try {
       return await this.userRepository.save(newUser);
     } catch (error) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       if (error.code === '23505') {
         throw new ConflictException('Email already exists');
       } else {
         throw new InternalServerErrorException();
       }
     }
+  }
+
+  async findById(id: number): Promise<User | null> {
+    return this.userRepository.findOneBy({ id });
   }
 
   async findByEmail(email: string): Promise<User | null> {

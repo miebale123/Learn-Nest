@@ -19,7 +19,6 @@ import { GetRefreshToken, GetUser, Roles } from './decorators';
 import type { AuthInternal, Profile } from './interfaces';
 import { SetRefreshTokenCookie } from './interceptors';
 import { Public } from 'src/common/decorators';
-import { User } from '../users/entities';
 import { AuditExclude } from 'src/audit/audit-exclude.decorator';
 import { PasswordService } from './password.service';
 import { AuthGuard } from '@nestjs/passport';
@@ -31,7 +30,7 @@ import {
   SignupDto,
   UpdatePasswordDto,
 } from './dto/auth-credentials.dto';
-import { RolesGuard } from './guards/roles.guard';
+import { User } from 'src/users/entities/user.entity';
 
 @Controller('auth')
 export class AuthController {

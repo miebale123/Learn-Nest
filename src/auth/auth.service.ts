@@ -8,9 +8,9 @@ import {
 import { JwtService } from '@nestjs/jwt';
 
 import { AuthInternal, JwtPayload, Profile } from './interfaces';
-import { User } from '../users/entities';
 import { UsersService } from '../users/users.service';
 import { SigninDto, SignupDto } from './dto/auth-credentials.dto';
+import { User } from 'src/users/entities/user.entity';
 @Injectable()
 export class AuthService {
   constructor(

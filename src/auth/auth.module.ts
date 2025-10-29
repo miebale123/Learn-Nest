@@ -8,13 +8,13 @@ import { APP_GUARD } from '@nestjs/core';
 import { ConfigType } from '@nestjs/config';
 import { configuration } from '../config/app.config';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
-import { User } from '../users/entities';
 import { MailModule } from 'src/mail/mail.module';
 import { MailService } from 'src/mail/mail.service';
 import { UsersService } from 'src/users/users.service';
 import { GoogleStrategy, JwtStrategy } from './strategies';
 import { UsersModule } from 'src/users/users.module';
 import { PasswordService } from './password.service';
+import { User } from 'src/users/entities/user.entity';
 
 @Module({
   imports: [

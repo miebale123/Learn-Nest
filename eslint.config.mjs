@@ -39,7 +39,7 @@ export default tseslint.config(
       '@typescript-eslint/explicit-module-boundary-types': 'off',
       '@typescript-eslint/require-await': 'off',
 
-      // ✅ Keep the important ones
+      //  Keep the important ones
       '@typescript-eslint/consistent-type-imports': 'warn',
       '@typescript-eslint/no-unused-vars': 'off',
       '@typescript-eslint/ban-ts-comment': 'warn',
