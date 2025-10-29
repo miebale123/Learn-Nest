@@ -14,8 +14,10 @@ import { typeOrmConfig } from './config/typeorm.config';
 import { AdminModule } from './admin/admin.module';
 import { HousesModule } from './houses/houses.module';
 import { BookmarkModule } from './bookmarks/bookmarks.module';
+import { Public } from './common';
 @Controller('/')
 class AppController {
+  @Public()
   @Get()
   root() {
     return 'hello';

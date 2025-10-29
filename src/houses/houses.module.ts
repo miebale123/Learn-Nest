@@ -21,6 +21,7 @@ import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UsersModule } from 'src/users/users.module';
 import { House } from './houses.entity';
+import { Public } from 'src/common';
 
 export class HouseDto {
   url: string;
@@ -69,6 +70,7 @@ export class HousesController {
     return await this.houseRepository.save(newHouse);
   }
 
+  @Public()
   @Get()
   async getAll() {
     return await this.houseRepository.find();
