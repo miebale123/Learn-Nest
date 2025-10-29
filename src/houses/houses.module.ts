@@ -7,6 +7,8 @@ import {
   Body,
   NotFoundException,
   forwardRef,
+  Get,
+  Param,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
@@ -14,53 +16,23 @@ import {
   UploadApiResponse,
   UploadApiErrorResponse,
 } from 'cloudinary';
-import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Readable } from 'stream';
-import {
-  Column,
-  Entity,
-  PrimaryGeneratedColumn,
-  CreateDateColumn,
-  UpdateDateColumn,
-  ManyToOne,
-} from 'typeorm';
 import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UsersModule } from 'src/users/users.module';
-import { User } from 'src/users/entities/user.entity';
-import { UsersService } from 'src/users/users.service';
+import { House } from './houses.entity';
 
-/* -------------------- ENTITY -------------------- */
-@Entity('houses')
-export class House {
-  @PrimaryGeneratedColumn()
-  id: number;
-
-  @Column()
-  secure_url: string;
-
-  @ManyToOne(() => User, (user) => user.houses, { nullable: false })
-  user: User;
-
-  @CreateDateColumn()
-  created_at: Date;
-
-  @UpdateDateColumn()
-  updated_at: Date;
-}
-
-/* -------------------- DTO -------------------- */
 export class HouseDto {
-  userId: number;
+  url: string;
+  price: string;
+  location: string;
 }
 
-/* -------------------- CONTROLLER -------------------- */
 @Controller('houses')
-export class HouseController {
+export class HousesController {
   constructor(
-    private readonly usersService: UsersService,
-    // @InjectRepository(House)
-    // private readonly houseRepository: Repository<House>,
+    @InjectRepository(House)
+    private readonly houseRepository: Repository<House>,
   ) {
     cloudinary.config({
       cloud_name: process.env.CLOUDINARY_NAME,
@@ -88,26 +60,34 @@ export class HouseController {
       Readable.from(file.buffer).pipe(upload);
     });
 
-    const user = await this.usersService.findById(dto.userId);
-    if (!user) throw new NotFoundException('User not found');
+    const newHouse = this.houseRepository.create({
+      secure_url: result.secure_url,
+      price: dto.price,
+      location: dto.location,
+    });
 
-    // const newHouse = this.houseRepository.create({
-    //   secure_url: result.secure_url,
-    //   user,
-    // });
+    return await this.houseRepository.save(newHouse);
+  }
 
-    // return await this.houseRepository.save(newHouse);
+  @Get()
+  async getAll() {
+    return await this.houseRepository.find();
+  }
+
+  @Get(':id')
+  async getOne(@Param('id') id: number) {
+    const house = await this.houseRepository.findOne({
+      where: { id },
+    });
+
+    if (!house) throw new NotFoundException('House not found');
+    return house;
   }
 }
 
 /* -------------------- MODULE -------------------- */
 @Module({
-  imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
-    TypeOrmModule.forFeature([House]),
-    forwardRef(() => UsersModule),
-  ],
-  controllers: [HouseController],
-  providers: [UsersService]
+  imports: [TypeOrmModule.forFeature([House]), forwardRef(() => UsersModule)],
+  controllers: [HousesController],
 })
 export class HousesModule {}

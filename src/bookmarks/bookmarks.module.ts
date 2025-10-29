@@ -1,128 +1,50 @@
-// import {
-//   Controller,
-//   Get,
-//   Post,
-//   Delete,
-//   Param,
-//   Body,
-//   Injectable,
-//   Module,
-//   NotFoundException,
-// } from '@nestjs/common';
-// import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
-// import { Repository } from 'typeorm';
-// import { User } from 'src/users/entities';
-// import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { Controller, Post, Body, Module, Get, Param } from '@nestjs/common';
+import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
+import { Bookmark } from './bookmarks.entity';
+import { User } from 'src/users/entities/user.entity';
+import { Repository } from 'typeorm';
+import { UsersService } from 'src/users/users.service';
 
-import { Module } from '@nestjs/common';
+class CreateBookmarkDto {
+  userId: number;
+  secure_url: string;
+  price: string;
+  location: string;
+}
 
-// /* -------------------- ENTITY -------------------- */
-// @Entity('bookmarks')
-// export class Bookmark {
-//   @PrimaryGeneratedColumn()
-//   id: number;
+@Controller('bookmarks')
+class BookmarkController {
+  constructor(
+    @InjectRepository(Bookmark)
+    private readonly bookmarkRepository: Repository<Bookmark>,
+    private readonly usersService: UsersService,
+  ) {}
 
-//   @Column()
-//   title: string;
+  @Post('create-bookmark')
+  async createBookmark(@Body() dto: CreateBookmarkDto) {
+    const user = await this.usersService.findById(dto.userId);
+    if (!user) return;
+    const newBookmark = this.bookmarkRepository.create({
+      price: dto.price,
+      location: dto.location,
+      secure_url: dto.secure_url,
+      user: user,
+    });
 
-//   @Column()
-//   imageUrl: string;
+    await this.bookmarkRepository.save(newBookmark);
+  }
 
-//   @Column()
-//   publicId: string; // House public ID for delete later
+  @Get()
+  async getBookmark(@Param('id') id: number) {
+    const foundUser = await this.usersService.findById(id);
+    if (!foundUser) return;
+    return foundUser.bookmarks;
+  }
+}
 
-//   @ManyToOne(() => User, (user) => user.bookmarks)
-//   user: User;
-// }
-
-// /* -------------------- DTO -------------------- */
-// class CreateBookmarkDto {
-//   title: string;
-//   imageUrl: string;
-// }
-
-// /* -------------------- REPOSITORY -------------------- */
-// @Injectable()
-// class BookmarkRepository {
-//   constructor(
-//     @InjectRepository(Bookmark)
-//     private readonly repo: Repository<Bookmark>,
-//   ) {}
-
-//   findAll() {
-//     return this.repo.find();
-//   }
-
-//   findById(id: number) {
-//     return this.repo.findOne({ where: { id } });
-//   }
-
-//   create(bookmarkData: Partial<Bookmark>) {
-//     const bookmark = this.repo.create(bookmarkData);
-//     return this.repo.save(bookmark);
-//   }
-
-//   async delete(id: number) {
-//     const bookmark = await this.findById(id);
-//     if (!bookmark) throw new NotFoundException('Bookmark not found');
-
-//     // Delete from House before DB
-//     await house.uploader.destroy(bookmark.publicId);
-//     return this.repo.remove(bookmark);
-//   }
-// }
-
-// /* -------------------- SERVICE -------------------- */
-// @Injectable()
-// class BookmarkService {
-//   constructor(private readonly repo: BookmarkRepository) {}
-
-//   async getAll() {
-//     return this.repo.findAll();
-//   }
-
-//   async addBookmark(dto: CreateBookmarkDto, user: User) {
-//     const uploadResult = await house.uploader.upload(dto.imageUrl);
-
-//     return this.repo.create({
-//       title: dto.title,
-//       imageUrl: uploadResult.secure_url,
-//       publicId: uploadResult.public_id,
-//       user,
-//     });
-//   }
-
-//   async removeBookmark(id: number) {
-//     return this.repo.delete(id);
-//   }
-// }
-
-// /* -------------------- CONTROLLER -------------------- */
-// @Controller('bookmarks')
-// class BookmarkController {
-//   constructor(private readonly service: BookmarkService) {}
-
-//   @Get()
-//   async getAll() {
-//     return this.service.getAll();
-//   }
-
-//   @Post()
-//   async create(@Body() dto: CreateBookmarkDto, user: User) {
-//     return this.service.addBookmark(dto, user);
-//   }
-
-//   @Delete(':id')
-//   async remove(@Param('id') id: number) {
-//     return this.service.removeBookmark(+id);
-//   }
-// }
-
-// /* -------------------- MODULE -------------------- */
-// @Module({
-//   imports: [TypeOrmModule.forFeature([Bookmark])],
-//   controllers: [BookmarkController],
-//   providers: [BookmarkRepository, BookmarkService],
-// })
-@Module({})
+@Module({
+  imports: [TypeOrmModule.forFeature([Bookmark, User])],
+  controllers: [BookmarkController],
+  providers: [UsersService],
+})
 export class BookmarkModule {}

@@ -8,8 +8,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { UserRole } from '../user.enum';
-// import { Bookmark } from 'src/bookmarks/bookmarks.module';
-import { House } from 'src/houses/houses.module';
+import { Bookmark } from 'src/bookmarks/bookmarks.entity';
 
 @Unique(['email'])
 @Entity('users')
@@ -41,11 +40,8 @@ export class User {
   @Column({ type: 'varchar', nullable: true })
   providerId?: string | null;
 
-  // @OneToMany(() => Bookmark, (bookmark) => bookmark.user, { eager: true })
-  // bookmarks: Bookmark[];
-
-  @OneToMany(() => House, (house) => house.user, { eager: true })
-  houses: House[];
+  @OneToMany(() => Bookmark, (bookmark) => bookmark.user, { eager: true })
+  bookmarks: Bookmark[];
 
   @CreateDateColumn()
   created_at: Date;

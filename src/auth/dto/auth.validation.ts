@@ -65,11 +65,10 @@ export const SignupSchema = registerSchema(
   SignupDto.name,
   z
     .object({
-      // email: z.preprocess(
-      //   preprocessEmail,
-      //   z.email({ message: 'enter a valid email' }),
-      // ),
-      email: z.string(),
+      email: z.preprocess(
+        preprocessEmail,
+        z.email({ message: 'enter a valid email' }),
+      ),
       password: z.string(),
     })
     .strict(),
@@ -79,15 +78,13 @@ export const SigninSchema = registerSchema(
   SigninDto.name,
   z
     .object({
-      // email: z.preprocess(
-      //   preprocessEmail,
-      //   z.email({ message: 'enter a valid email' }),
-      // ),
-      // password: z.string({
-      //   error: () => ({ message: 'password is required' }),
-      // }),
-      email: z.string(),
-      password: z.string(),
+      email: z.preprocess(
+        preprocessEmail,
+        z.email({ message: 'enter a valid email' }),
+      ),
+      password: z.string({
+        error: () => ({ message: 'password is required' }),
+      }),
     })
     .strict(),
 );

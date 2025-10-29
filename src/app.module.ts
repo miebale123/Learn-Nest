@@ -13,6 +13,7 @@ import { configuration } from './config/app.config';
 import { typeOrmConfig } from './config/typeorm.config';
 import { AdminModule } from './admin/admin.module';
 import { HousesModule } from './houses/houses.module';
+import { BookmarkModule } from './bookmarks/bookmarks.module';
 @Controller('/')
 class AppController {
   @Get()
@@ -59,7 +60,8 @@ class AppController {
     AuditModule,
     AuthModule,
     AdminModule,
-    HousesModule
+    HousesModule,
+    BookmarkModule,
   ],
   providers: [
     GlobalExceptionFilter,

@@ -18,11 +18,11 @@ export const configuration = registerAs('config', () => {
 
       database: {
         url: validated.DB_URL,
-        host: validated.DB_HOST,
-        port: validated.DB_PORT,
-        user: validated.DB_USER,
-        password: validated.DB_PASSWORD,
-        name: validated.DB_NAME,
+        // host: validated.DB_HOST,
+        // port: validated.DB_PORT,
+        // user: validated.DB_USER,
+        // password: validated.DB_PASSWORD,
+        // name: validated.DB_NAME,
         synchronize: validated.DB_SYNCHRONIZE,
         logging: validated.DB_LOGGING,
         autoLoadEntities: validated.AUTOLOADENTITIES,
