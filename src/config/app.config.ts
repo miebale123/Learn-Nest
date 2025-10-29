@@ -16,7 +16,7 @@ export const configuration = registerAs('config', () => {
       admin_email: validated.ADMIN_EMAIL,
       admin_pass: validated.ADMIN_PASS,
 
-      database: {
+    database: {
         url: validated.DB_URL,
         // host: validated.DB_HOST,
         // port: validated.DB_PORT,

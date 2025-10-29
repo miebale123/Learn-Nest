@@ -34,7 +34,7 @@ class BookmarkController {
     await this.bookmarkRepository.save(newBookmark);
   }
 
-  @Get()
+  @Get(':id')
   async getBookmark(@Param('id') id: number) {
     const foundUser = await this.usersService.findById(id);
     if (!foundUser) return;
